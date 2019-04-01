@@ -18,6 +18,7 @@ public class RestServerActivator implements BundleActivator {
 	private MyQueue inputQueue;
 	private MyQueue outputQueue;
 	private Server server;
+	private JAXRSServerFactoryBean factoryBean;
 	
 	public void start(final BundleContext context) throws NamingException, JMSException {
 		createQueues();
@@ -38,16 +39,19 @@ public class RestServerActivator implements BundleActivator {
 	}
 	
 	private void startServer() {
-		JAXRSServerFactoryBean factoryBean = new JAXRSServerFactoryBean();
+		factoryBean = new JAXRSServerFactoryBean();
 		factoryBean.setResourceClasses(Endpoint.class);
 		factoryBean.setResourceProvider(new SingletonResourceProvider(new Endpoint(inputQueue, outputQueue)));
 		factoryBean.setAddress("http://localhost:8080/");
 		server = factoryBean.create();
+		
 	}
 	
 	private void stopServer() {
 		if (server != null && server.isStarted()) {
+			server.stop();
 			server.destroy();
+			factoryBean.getBus().shutdown(true);
 		}
 	}
 }

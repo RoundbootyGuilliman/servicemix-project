@@ -48,8 +48,6 @@ public class MyQueue {
 		if (consumer == null) {
 			consumer = session.createConsumer(queue);
 		}
-		System.out.println(consumer.getClass());
-		
 		consumer.setMessageListener(messageListener);
 	}
 	
